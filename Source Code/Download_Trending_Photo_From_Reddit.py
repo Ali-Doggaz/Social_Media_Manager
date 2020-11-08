@@ -25,9 +25,13 @@ def same_picture(pic1,pic2):
     '''
     im1 = Image.open(pic1)
     im2 = Image.open(pic2)
-    if ImageChops.difference(im2, im1).getbbox() is None:
-        return 1
-    return 0
+    try:
+        if ImageChops.difference(im2, im1).getbbox() is None:
+            return 1
+        return 0
+    except:
+        return 0
+
 
 def download_reddit(n): #DOWNLOAD USING SELENIUM
     driver = webdriver.Chrome('chromedriver.exe')
