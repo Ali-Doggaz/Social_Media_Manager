@@ -34,6 +34,14 @@ def same_picture(pic1,pic2):
 
 
 def download_reddit(n): #DOWNLOAD USING SELENIUM
+        '''
+    :param:
+    n : number of pictures to download
+    Role: download the n most trending pictures from reddit. If the user already downloaded a picture, the function won't download it again and will get the next 
+    most trending picture.
+    :return:
+    None
+    '''
     driver = webdriver.Chrome('chromedriver.exe')
     for i in range(n):
         driver.get('https://www.reddit.com/r/food/hot/')
@@ -83,6 +91,17 @@ def download_reddit(n): #DOWNLOAD USING SELENIUM
     driver.close()
 
 def download_reddit_PRAWN(n,subreddit_name, data_path): #DOWNLOAD USING PRAWN (WAY QUICKER)
+    '''
+    :param:
+    n : number of pictures to download
+    subreddit_name : (string) name of the subreddit to download pictures from
+    data_path : (string) Path to the download folder
+    Role: download the n most trending pictures from reddit. If the user already downloaded a picture, the function won't download it again and will get the next 
+    most trending picture.
+    
+    :return:
+    None
+    ''' 
     reddit = praw.Reddit(client_id='TtC6ss4zB1F_2g',
                          client_secret='Pp5Im-Om1_AZgXochZqF7wqovsc',
                          user_agent='Downloader')
