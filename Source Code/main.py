@@ -153,8 +153,7 @@ def login_verify():
 
 def clearwin(event=None):
     '''Clear the main windows frame of all widgets'''
-    #for child in mframe.winfo_children():
-        #child.destroy()
+    
     global mframe
     mframe.destroy()
     mframe = tkinter.Frame(main, width=800, height=600, background='pink')
@@ -196,7 +195,7 @@ def download():
             t = threading.Thread(target=invalid_message_2)
             t.start()
 
-        else: #If everything is good to go, start downloading !
+        else: #If everything is good to go, start downloading 
             n = int(s) + 1
 
             def call():
@@ -297,6 +296,11 @@ def win1(event=None):
 # in, etc...)
 
 def win2_Login(event=None):
+    """
+    Generates the login screen.
+    The username/password combination provided by the user will be verified.
+    If the combination is correct, generates the next menu (def win6_Account(event=None), see line 490).
+    """
     global IMAGES_FILE_PATH
 
     clearwin()
@@ -328,8 +332,15 @@ def win2_Login(event=None):
     tkinter.Button(mframe, text='Back', width=10, height=1, command=win1, bg='pink').pack()
 
 def win3_ManagePictures(event=None):
+    """
+    Generates a simple menu containing 3 buttons:
+    button 1: 'Download Pictures', will take the user to the picture downloader menu.
+    button 2: 'Manage Database/Add Captions', will prompt all the user's downloaded pictures and their captions.
+    The user will be able to modify any caption.
+    button 3: 'Back', takes the user back to the previous menu.
+    """
+    
     global IMAGES_FILE_PATH
-
     clearwin()
     mframe.pack_propagate(0)
     b1 = tkinter.Button(mframe, command=win4_DownloadPictures, text='Download Pictures', bg='violet', padx=25)
@@ -343,6 +354,12 @@ def win3_ManagePictures(event=None):
     b3.place(relx=0.5, rely=0.7, anchor='center')
 
 def win4_DownloadPictures(event=None):
+    """
+    Generates the download screen. The user will be asked to write a certain theme's name (ie: food, cars, models, etc...), the 
+    number of pictures he wishes to download, and a few other details.
+    The app will then download the most trending pictures related to that theme.
+    """
+    
     clearwin()
 
     global count_download_request
@@ -371,6 +388,15 @@ def win4_DownloadPictures(event=None):
     back.pack()
 
 def win5_ManageData_Caption(event=None):
+    """
+    Each picture downloaded (or manually added to the images' folder) will be prompted. 
+    If a caption of the picture is stored, it will also be displayed.
+    The user will have a text box below each image, and will be able to edit the caption 
+    as much as he wants.
+    To go the next picture, the user will either click on the 'Add description' button, or
+    press the right arrow key of his keyboard.
+    """
+    
     clearwin()
     global IMAGES_FILE_PATH
     global i
@@ -462,6 +488,12 @@ def win5_ManageData_Caption(event=None):
         t.start()
 
 def win6_Account(event=None):
+    """
+    This menu will give the user access to 2 main features:
+        *Activating the bot (following, dming, liking pictures, etc...)
+        *Uploading a downloaded picture
+    """
+    
     clearwin()
     mframe.pack_propagate(0)
 
@@ -497,6 +529,15 @@ def win6_Account(event=None):
     back.place(relx=0.5, rely=0.67, anchor='center')
 
 def win7_Like_Follow(event=None):
+    """
+    This is where the Bot kicks in. 
+    In this menu, the user will be asked several informations to
+    determine how the bot will work. Once all the necessary information is
+    entered by the user (Number of pictures to like, nbr of person to follow, 
+    whether or not to show the web scraping while it is occuring (make a chrome
+    window appear and shows all the bot's action), etc...), the bot will start working.
+    """
+    
     clearwin()
     mframe.pack_propagate(0)
 
@@ -595,7 +636,8 @@ def win7_Like_Follow(event=None):
 
 def win8_Upload(event=None):
     '''
-    RQ : If you are uploading a picture with no description, you'll need to provide a description!
+    Uploads the last downloaded picture with its caption.
+    RK : If you are uploading a picture with no description, you'll need to provide one!
     '''
 
     def call_upload():
@@ -670,6 +712,9 @@ def win8_Upload(event=None):
 
 
 if __name__ == '__main__':
+    """
+    Generates the main window
+    """
     main = tkinter.Tk()
     main.config(width=800, height=600, background='pink')
     main.title('Instagram Manager')
