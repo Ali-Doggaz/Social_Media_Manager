@@ -12,6 +12,7 @@ import random
 import praw
 from prawcore import NotFound
 
+bool_credentials_confirmed = False
 USERNAME1 = ''
 PASSWORD1 = ''
 k = 1
@@ -19,36 +20,40 @@ i = 0
 like = 0
 follow = 0
 ig = None
-count_download_request = -1
-IMAGES_FILE_PATH = '' #Path to the file Containing everything to store (Pictures, Captions, DMs, etc...)
+count_download_request = -1  # Counts the number of download requests
+IMAGES_FILE_PATH = ''  # Path to the file Containing everything to store (Pictures, Captions, DMs, etc...)
+
 
 def update_path(path_entry):
     global IMAGES_FILE_PATH
     IMAGES_FILE_PATH = path_entry.get()
 
+
 def clear_trailing_newlines(str):
-    '''
+    """
     :param str:
     deletes all trailing newlines in a string
     :return:
     The trailing newlines' free string
     I.e: 'test\n\n' -->'test'
-    '''
+    """
 
-    while(len(str)>0):
+    while (len(str) > 0):
         if str[-1] == '\n':
             str = str[0:-1]
         else:
             break
     return str
 
+
 def sub_exists(sub):
-    '''
+    """
     :param sub (string, name of a potential subreddit):
     :return:
     1 if the subreddit exists
     0 if it doesn't
-    '''
+    """
+
     reddit = praw.Reddit(client_id='TtC6ss4zB1F_2g',
                          client_secret='Pp5Im-Om1_AZgXochZqF7wqovsc',
                          user_agent='Downloader')
@@ -59,20 +64,24 @@ def sub_exists(sub):
         exists = False
     return exists
 
+
 def destroy_widget(widget):
-    '''
+    """
     :param widget:
     :return:
     destroys the widget from the frame
-    '''
+    """
+
     widget.destroy
 
+
 def load():
-    '''
+    """
     Load all the stored captions
     :return:
     a dictionary containing each picture's name and corresponding caption
-    '''
+    """
+
     data = dict()
     global IMAGES_FILE_PATH
     chdir(IMAGES_FILE_PATH)
@@ -83,16 +92,17 @@ def load():
                 url = row['url']
                 data[url] = row['description']
         f.close()
-    except Exception: #If no Descriptions found
+    except Exception:  # If no Descriptions found
         return data
     return data
 
+
 def save(Descriptions):  # Save the new added Descriptions
-    '''
+    """
     :param dict(Descriptions), containing each picture's name and its corresponding caption :
     :return:
     stores the dict content in a .txt file
-    '''
+    """
 
     global IMAGES_FILE_PATH
     chdir(IMAGES_FILE_PATH)
@@ -102,12 +112,14 @@ def save(Descriptions):  # Save the new added Descriptions
         for url in Descriptions.keys():
             mycsv.writerow([url, Descriptions[url]])
 
+
 def load_DM():
-    '''
+    """
     :return:
     Load the list of the persons previously DMed
     Utility : avoid messaging the same person twice, even after several uses of the app.
-    '''
+    """
+
     global IMAGES_FILE_PATH
     chdir(IMAGES_FILE_PATH)
     data = []
@@ -118,52 +130,64 @@ def load_DM():
         return data
     return data
 
+
 def login_verify():
-    '''
+    """
     Verify the (username,password) combination
     :return:
     1 if valid
     0 if invalid
-    '''
+    """
     global USERNAME1
     global PASSWORD1
     USERNAME1 = username.get()
     PASSWORD1 = password.get()
+
     def call():
-        win2_Login()
+        global bool_credentials_confirmed
+        global ig
         username.set(USERNAME1)
         password.set(PASSWORD1)
-        wait = tkinter.Label(mframe, text="Please Wait While We're Logging You", bg='pink', width=200, font=("Courier", 13), pady=50)
+
+        wait = tkinter.Label(mframe, text="Please Wait While We're Logging You", bg='pink', width=200,
+                             font=("Courier", 13), pady=50)
         wait.pack()
-        global ig
-        ig = InstagramBot(USERNAME1, PASSWORD1, 0)
+        ig = InstagramBot(USERNAME1, PASSWORD1, 1)
         bool = ig.login_verify()
+
         if bool:
+            bool_credentials_confirmed = True
             win6_Account()
         else:
             wait.pack_forget()
-            Invalid_Message = tkinter.Label(mframe, text="Invalid Details", bg='pink', width=200, font=("Courier", 20), pady=50)
+            Invalid_Message = tkinter.Label(mframe, text="Invalid Details", bg='pink', width=200, font=("Courier", 20),
+                                            pady=50)
             Invalid_Message.pack()
             time.sleep(1)
             Invalid_Message.pack_forget()
 
-
     t = threading.Thread(target=call)
     t.start()
 
+
 def clearwin(event=None):
-    '''Clear the main windows frame of all widgets'''
-    
+    """
+    Clear the main windows frame of all widgets
+    """
+    # for child in mframe.winfo_children():
+    # child.destroy()
     global mframe
     mframe.destroy()
     mframe = tkinter.Frame(main, width=800, height=600, background='pink')
     mframe.pack(fill="both", expand=True, padx=20, pady=20)
 
+
 def download():
-    '''
+    """
     Downloads the number of pictures needed by the user
     Displays any error if encountered
-    '''
+    """
+
     def call():
         global count_download_request
         count_download_request += 1
@@ -172,9 +196,9 @@ def download():
         if s == '' or s == '0' or not s.isnumeric():
             def invalid_msg_1():
                 Waiting_Label_1 = tkinter.Label(mframe, text="Please indicate a valid number", bg='pink', width=200,
-                                              font=("Courier", 10))
+                                                font=("Courier", 10))
                 Waiting_Label_2 = tkinter.Label(mframe, text="of pictures to download", bg='pink', width=200,
-                                              font=("Courier", 10))
+                                                font=("Courier", 10))
                 Waiting_Label_1.pack()
                 Waiting_Label_2.pack()
                 time.sleep(1.5)
@@ -186,8 +210,9 @@ def download():
 
         elif subreddit_name == '' or not sub_exists(subreddit_name):
             def invalid_message_2():
-                Waiting_Label_3 = tkinter.Label(mframe, text="Please provide a valid Subreddit name", bg='pink', width=200,
-                                              font=("Courier", 10))
+                Waiting_Label_3 = tkinter.Label(mframe, text="Please provide a valid Subreddit name", bg='pink',
+                                                width=200,
+                                                font=("Courier", 10))
                 Waiting_Label_3.pack()
                 time.sleep(1.5)
                 Waiting_Label_3.pack_forget()
@@ -195,59 +220,59 @@ def download():
             t = threading.Thread(target=invalid_message_2)
             t.start()
 
-        else: #If everything is good to go, start downloading 
+        else:  # If everything is good to go, start downloading !
             n = int(s) + 1
 
             def call():
                 global count_download_request
                 global IMAGES_FILE_PATH
-                if len(IMAGES_FILE_PATH)<=0:
+                if len(IMAGES_FILE_PATH) <= 0:
                     def invalid_path_error():
-                        Error_Label = tkinter.Label(mframe, text="Invalid Download Path, please go back to", bg='pink', width=200,
-                                                      font=("Courier", 14), pady=50)
+                        Error_Label = tkinter.Label(mframe, text="Invalid Download Path, please go back to", bg='pink',
+                                                    width=200,
+                                                    font=("Courier", 14), pady=50)
                         Error_Label.pack()
                         Error_Label2 = tkinter.Label(mframe, text="Main Menu And Provide A Valid Path", bg='pink',
-                                                    width=200, font=("Courier", 14), pady=50)
+                                                     width=200, font=("Courier", 14), pady=50)
                         Error_Label2.pack()
                         time.sleep(1.5)
                         Error_Label.pack_forget()
                         Error_Label2.pack_forget()
                         win1()
 
-
                     t = threading.Thread(target=invalid_path_error())
                     t.start()
                 else:
                     if count_download_request == 0:
                         Waiting_Label = tkinter.Label(mframe, text="Downloading... Please Wait", bg='pink', width=200,
-                                                    font=("Courier", 20), pady=50)
+                                                      font=("Courier", 20), pady=50)
                         Waiting_Label.pack()
                     else:
-                        Waiting_Label = tkinter.Label(mframe, text=f"Please Wait...(request{count_download_request})", bg='pink', width=200,
-                                                          font=("Courier", 20), pady=50)
+                        Waiting_Label = tkinter.Label(mframe, text=f"Please Wait...(request{count_download_request})",
+                                                      bg='pink', width=200,
+                                                      font=("Courier", 20), pady=50)
 
                     Waiting_Label.pack()
-                    if not os.path.exists(IMAGES_FILE_PATH+os.sep+'Images'):
-                        os.mkdir(IMAGES_FILE_PATH+os.sep+'Images')
+                    if not os.path.exists(IMAGES_FILE_PATH + os.sep + 'Images'):
+                        os.mkdir(IMAGES_FILE_PATH + os.sep + 'Images')
                     pictures_downloaded_bool = download_reddit_PRAWN(n, subreddit_name, IMAGES_FILE_PATH)
                     if pictures_downloaded_bool:
-                        count_download_request-=1
+                        count_download_request -= 1
                         Waiting_Label.pack_forget()
                         Done_Label = tkinter.Label(mframe, text="Pictures Downloaded!", bg='pink', width=200,
-                                                      font=("Courier", 20), pady=50)
+                                                   font=("Courier", 20), pady=50)
                         Done_Label.pack()
                         time.sleep(1)
                         Done_Label.pack_forget()
                     else:
                         count_download_request -= 1
                         Waiting_Label.pack_forget()
-                        Done_Label = tkinter.Label(mframe, text="Not enough trending pictures in subreddit!", bg='pink', width=200,
+                        Done_Label = tkinter.Label(mframe, text="Not enough trending pictures in subreddit!", bg='pink',
+                                                   width=200,
                                                    font=("Courier", 20), pady=50)
                         Done_Label.pack()
                         time.sleep(1.5)
                         Done_Label.pack_forget()
-
-
 
             t2 = threading.Thread(target=call)
             t2.start()
@@ -255,15 +280,24 @@ def download():
     t1 = threading.Thread(target=call)
     t1.start()
 
+# All win{i}_{name} below generate the iTH page of the app. In total, there are
+# 8 pages. Each one deals with a certain feature (Uploading content, Downloading pictures, Liking/DMing people, logging
+# in, etc...)
+
 def win1(event=None):
-    '''
+    """
     Generates the main menu
-    '''
+    """
     clearwin()
     mframe.pack_propagate(0)
-    b1 = tkinter.Button(mframe, command=win2_Login, text='Manage Account', bg='violet', padx=25)
-    b1.pack(side='top', expand='YES')
-    b1.place(relx=0.5, rely=0.3, anchor='center')
+    if bool_credentials_confirmed:
+        b1 = tkinter.Button(mframe, command=win6_Account, text='Manage Account', bg='violet', padx=25)
+        b1.pack(side='top', expand='YES')
+        b1.place(relx=0.5, rely=0.3, anchor='center')
+    else:
+        b1 = tkinter.Button(mframe, command=win2_Login, text='Manage Account', bg='violet', padx=25)
+        b1.pack(side='top', expand='YES')
+        b1.place(relx=0.5, rely=0.3, anchor='center')
     b2 = tkinter.Button(mframe, command=win3_ManagePictures, text='Manage Pictures', bg='violet', padx=25)
     b2.pack(side='top', expand='YES')
     b2.place(relx=0.5, rely=0.4, anchor='center')
@@ -286,14 +320,9 @@ def win1(event=None):
     path_entry.place(relx=0.5, rely=0.59, anchor='center')
     images_path.set(IMAGES_FILE_PATH)
 
-    back = tkinter.Button(mframe, command= lambda : update_path(images_path), text='Validate Path', bg='violet', padx=40)
+    back = tkinter.Button(mframe, command=lambda: update_path(images_path), text='Validate Path', bg='violet', padx=40)
     back.pack()
     back.place(relx=0.5, rely=0.63, anchor='center')
-
-
-#All win{i}_{name} below generate the iTH page of the app. In total, there are
-# 8 pages. Each one deals with a certain feature (Uploading content, Downloading pictures, Liking/DMing people, logging
-# in, etc...)
 
 def win2_Login(event=None):
     """
@@ -301,12 +330,16 @@ def win2_Login(event=None):
     The username/password combination provided by the user will be verified.
     If the combination is correct, generates the next menu (def win6_Account(event=None), see line 490).
     """
-    global IMAGES_FILE_PATH
 
+    global IMAGES_FILE_PATH
+    global bool_credentials_confirmed
+    bool_credentials_confirmed = False
+    
     clearwin()
     login_screen = mframe
 
-    tkinter.Label(login_screen, text="Please enter your instagram details", bg='pink', width=200, font=("Courier", 20), pady=50).pack()
+    tkinter.Label(login_screen, text="Please enter your instagram details", bg='pink', width=200,
+                    font=("Courier", 20), pady=50).pack()
     login_screen.place(relx=0.5, rely=0.3, anchor='center')
     tkinter.Label(login_screen, text="", bg='pink').pack()
 
@@ -319,17 +352,19 @@ def win2_Login(event=None):
     global password_login_entry
 
     tkinter.Label(login_screen, text="Username ", bg='pink').pack()
-    username_login_entry = tkinter.Entry(login_screen, textvariable=username, bg='pink', width=33, font=("Courier", 13))
+    username_login_entry = tkinter.Entry(login_screen, textvariable=username, bg='pink', width=33,
+                                            font=("Courier", 13))
     username_login_entry.pack()
     tkinter.Label(login_screen, text="", bg='pink').pack()
     tkinter.Label(login_screen, text="Password ", bg='pink').pack()
     password_login_entry = tkinter.Entry(login_screen, textvariable=password, show='*', bg='pink', width=33,
-                                 font=("Courier", 13))
+                                             font=("Courier", 13))
     password_login_entry.pack()
     tkinter.Label(login_screen, text="", bg='pink').pack()
 
     tkinter.Button(login_screen, text="Login", width=10, height=1, command=login_verify, bg='pink').pack()
     tkinter.Button(mframe, text='Back', width=10, height=1, command=win1, bg='pink').pack()
+
 
 def win3_ManagePictures(event=None):
     """
@@ -339,34 +374,41 @@ def win3_ManagePictures(event=None):
     The user will be able to modify any caption.
     button 3: 'Back', takes the user back to the previous menu.
     """
-    
+
     global IMAGES_FILE_PATH
+
     clearwin()
     mframe.pack_propagate(0)
     b1 = tkinter.Button(mframe, command=win4_DownloadPictures, text='Download Pictures', bg='violet', padx=25)
     b1.pack(side='top', expand='YES')
     b1.place(relx=0.5, rely=0.3, anchor='center')
-    b2 = tkinter.Button(mframe, command=win5_ManageData_Caption, text='Manage Database/Add Captions', bg='violet', padx=25)
+
+    b2 = tkinter.Button(mframe, command=win5_ManageData_Caption, text='Manage Database/Add Captions', bg='violet',
+                        padx=25)
     b2.pack(side='top', expand='YES')
     b2.place(relx=0.5, rely=0.5, anchor='center')
+
     b3 = tkinter.Button(mframe, text='Back', width=10, height=1, command=win1, bg='violet', padx=25)
     b3.pack(side='top', expand='YES')
-    b3.place(relx=0.5, rely=0.7, anchor='center')
+    b3.place(relx=0.5, rely=0.9, anchor='center')
+
 
 def win4_DownloadPictures(event=None):
     """
-    Generates the download screen. The user will be asked to write a certain theme's name (ie: food, cars, models, etc...), the 
+    Generates the download screen. The user will be asked to write a certain theme's name (ie: food, cars, models, etc...), the
     number of pictures he wishes to download, and a few other details.
     The app will then download the most trending pictures related to that theme.
     """
-    
+
     clearwin()
 
     global count_download_request
     count_download_request = -1
 
-    tkinter.Label(mframe, text="Please enter a subreddit's name or a theme's name (I.e: food, cars, models, etc...)", bg='pink', width=100, font=("Courier", 12)).pack()
-    tkinter.Label(mframe, text="(We will soon add the possibility to download from pixabay and other such website)", bg='pink', width=200, font=("Courier", 10)).pack()
+    tkinter.Label(mframe, text="Please enter a subreddit's name or a theme's name (I.e: food, cars, models, etc...)",
+                  bg='pink', width=100, font=("Courier", 12)).pack()
+    tkinter.Label(mframe, text="(We will soon add the possibility to download from pixabay and other such website)",
+                  bg='pink', width=200, font=("Courier", 10)).pack()
     mframe.place(relx=0.5, rely=0.3, anchor='center')
 
     global subreddit
@@ -379,7 +421,7 @@ def win4_DownloadPictures(event=None):
 
     subreddit_entry = tkinter.Entry(mframe, textvariable=subreddit, bg='pink', width=33, font=("Courier", 13)).pack()
 
-    tkinter.Label(mframe, text="Number Of Pictures To download:",bg='pink', width=200, font=("Courier", 13)).pack()
+    tkinter.Label(mframe, text="Number Of Pictures To download:", bg='pink', width=200, font=("Courier", 13)).pack()
     number_entry = tkinter.Entry(mframe, textvariable=number, bg='pink', width=33, font=("Courier", 13))
     number_entry.pack()
 
@@ -387,25 +429,26 @@ def win4_DownloadPictures(event=None):
     back = tkinter.Button(mframe, text='Back', width=10, height=1, command=win3_ManagePictures, bg='pink')
     back.pack()
 
+
 def win5_ManageData_Caption(event=None):
     """
-    Each picture downloaded (or manually added to the images' folder) will be prompted. 
+    Each picture downloaded (or manually added to the images' folder) will be prompted.
     If a caption of the picture is stored, it will also be displayed.
-    The user will have a text box below each image, and will be able to edit the caption 
+    The user will have a text box below each image, and will be able to edit the caption
     as much as he wants.
     To go the next picture, the user will either click on the 'Add description' button, or
     press the right arrow key of his keyboard.
     """
-    
+
     clearwin()
     global IMAGES_FILE_PATH
     global i
-    i=0
+    i = 0
 
     Descriptions = load()
     imgs = []
-    if os.path.exists(IMAGES_FILE_PATH+sep+'Images'):
-        for picture in sorted(listdir(IMAGES_FILE_PATH+sep+'Images')):  # Store all the Images' Path in imgs []
+    if os.path.exists(IMAGES_FILE_PATH + sep + 'Images'):
+        for picture in sorted(listdir(IMAGES_FILE_PATH + sep + 'Images')):  # Store all the Images' Path in imgs []
             path = fr'Images\{picture}'
             imgs.append(path)
 
@@ -477,15 +520,16 @@ def win5_ManageData_Caption(event=None):
             b1 = tkinter.Label(mframe, text='Please Download Pictures (Or', font=("Courier", 18), bg='pink')
             b1.pack(side='top', expand='YES')
             b1.place(relx=0.5, rely=0.4, anchor='center')
-            b1 = tkinter.Label(mframe, text='Add Them Manually) Before Adding Captions', font=("Courier", 18), bg='pink')
+            b1 = tkinter.Label(mframe, text='Add Them Manually) Before Adding Captions', font=("Courier", 18),
+                               bg='pink')
             b1.pack(side='top', expand='YES')
             b1.place(relx=0.5, rely=0.5, anchor='center')
             time.sleep(1.5)
             win3_ManagePictures()
 
-
         t = threading.Thread(target=no_pictures_error)
         t.start()
+
 
 def win6_Account(event=None):
     """
@@ -493,20 +537,26 @@ def win6_Account(event=None):
         *Activating the bot (following, dming, liking pictures, etc...)
         *Uploading a downloaded picture
     """
-    
     clearwin()
     mframe.pack_propagate(0)
 
     global IMAGES_FILE_PATH
 
-    b1 = tkinter.Button(mframe, command=win7_Like_Follow, text='Like, Follow, and DM Automatically, to make your account better placed in Instagram Algorithm', bg='violet', padx=25)
+    b1 = tkinter.Button(mframe, command=win7_Like_Follow,
+                        text='Like, Follow, and DM Automatically, to make your account better placed in Instagram Algorithm',
+                        bg='violet', padx=25)
     b1.pack(side='top', expand='YES')
-    b1.place(relx=0.5, rely=0.3, anchor='center')
+    b1.place(relx=0.5, rely=0.2, anchor='center')
 
     b2 = tkinter.Button(mframe, command=win8_Upload, text="Upload A Picture From The Database With Its caption",
                         bg='violet', padx=25)
     b2.pack(side='top', expand='YES')
-    b2.place(relx=0.5, rely=0.4, anchor='center')
+    b2.place(relx=0.5, rely=0.3, anchor='center')
+
+    change_account = tkinter.Button(mframe, text='    Change Account    ', width=10, height=1, command=win2_Login, bg='violet', padx=25)
+    change_account.pack(side='top', expand='YES')
+    change_account.place(relx=0.5, rely=0.4, anchor='center')
+
 
     text2 = tkinter.Label(mframe, text="You Can Modify The Download Path Here", bg='pink')
     text2.pack()
@@ -520,24 +570,24 @@ def win6_Account(event=None):
     path_entry.place(relx=0.5, rely=0.55, anchor='center')
     images_path.set(IMAGES_FILE_PATH)
 
-    back = tkinter.Button(mframe, command= lambda : update_path(images_path), text='Validate Path ', bg='violet', padx=40)
-    back.pack()
-    back.place(relx=0.5, rely=0.6, anchor='center')
+    path_button = tkinter.Button(mframe, command=lambda: update_path(images_path), text='Validate Path ', bg='violet', padx=40)
+    path_button.pack()
+    path_button.place(relx=0.5, rely=0.6, anchor='center')
 
     back = tkinter.Button(mframe, command=win1, text='      Back      ', bg='violet', padx=40)
     back.pack(padx=23)
     back.place(relx=0.5, rely=0.67, anchor='center')
 
+
 def win7_Like_Follow(event=None):
     """
-    This is where the Bot kicks in. 
+    This is where the Bot kicks in.
     In this menu, the user will be asked several informations to
     determine how the bot will work. Once all the necessary information is
-    entered by the user (Number of pictures to like, nbr of person to follow, 
+    entered by the user (Number of pictures to like, nbr of person to follow,
     whether or not to show the web scraping while it is occuring (make a chrome
     window appear and shows all the bot's action), etc...), the bot will start working.
     """
-    
     clearwin()
     mframe.pack_propagate(0)
 
@@ -582,7 +632,9 @@ def win7_Like_Follow(event=None):
                     msg = messages_to_send.split(',')
                     Dms_List = load_DM()
                     ig.login()
-                    ig.like_photo_with_DM(tag, tags, follow, int(max_follows), int(max_likes), Dms_List, msg, IMAGES_FILE_PATH)
+                    ig.like_photo_with_DM(tag, tags, follow, int(max_follows), int(max_likes), Dms_List, msg,
+                                          IMAGES_FILE_PATH)
+
                 t = threading.Thread(target=send_with_DM)
                 t.start()
             else:  # If we won't DM anyone:
@@ -592,7 +644,6 @@ def win7_Like_Follow(event=None):
 
                 t = threading.Thread(target=send_without_DM)
                 t.start()
-
 
     tags_string = tkinter.StringVar()
     number_likes = tkinter.StringVar()
@@ -634,43 +685,46 @@ def win7_Like_Follow(event=None):
     tkinter.Button(mframe, text="Run", width=10, height=1, command=Run, bg='pink').pack(pady=5)
     tkinter.Button(mframe, text='Back', width=10, height=1, command=win6_Account, bg='pink').pack(pady=5)
 
+
 def win8_Upload(event=None):
-    '''
+    """
     Uploads the last downloaded picture with its caption.
     RK : If you are uploading a picture with no description, you'll need to provide one!
-    '''
+    """
 
     def call_upload():
 
         global IMAGES_FILE_PATH
-        if len(IMAGES_FILE_PATH)>0:
-            if os.path.exists(IMAGES_FILE_PATH) and os.path.exists(IMAGES_FILE_PATH+os.sep+'Images'):
+        if len(IMAGES_FILE_PATH) > 0:
+            if os.path.exists(IMAGES_FILE_PATH) and os.path.exists(IMAGES_FILE_PATH + os.sep + 'Images'):
                 chdir(IMAGES_FILE_PATH)
-                test=0 #Boolean to check if there are pictures in database
+                test = 0  # Boolean to check if there are pictures in database
                 try:
                     for file in listdir('Images'):
                         if file.endswith('jpg') or file.endswith('jpeg') or file.endswith('png'):
-                            test=1
+                            test = 1
                             break
                 except Exception:
-                    test=0
+                    test = 0
 
-            if test==0: #If No Pictures in Database
-                Error_Message = tkinter.Label(mframe, text="No Picture in database! Please download a picture and add a caption.", bg='pink', width=200,
-                                             font=("Courier", 10))
+            if test == 0:  # If No Pictures in Database
+                Error_Message = tkinter.Label(mframe,
+                                              text="No Picture in database! Please download a picture and add a caption.",
+                                              bg='pink', width=200,
+                                              font=("Courier", 10))
                 Error_Message.pack()
                 Error_Message.place(relx=0.5, rely=0.7, anchor='center')
                 time.sleep(1.5)
                 Error_Message.pack_forget()
 
-            else: #If everything is good to go
+            else:  # If everything is good to go
                 Wait_Message = tkinter.Label(mframe, text="Uploading, please wait...", bg='pink', width=200,
                                              font=("Courier", 18))
                 Wait_Message.pack()
                 Wait_Message.place(relx=0.5, rely=0.8, anchor='center')
                 global USERNAME1
                 global PASSWORD1
-                upload(USERNAME1,PASSWORD1,IMAGES_FILE_PATH)
+                upload(USERNAME1, PASSWORD1, IMAGES_FILE_PATH)
                 Wait_Message.pack_forget()
 
         else:
@@ -700,7 +754,6 @@ def win8_Upload(event=None):
     info2_Message.pack()
     info2_Message.place(relx=0.5, rely=0.3, anchor='center')
 
-
     Upload_Button = tkinter.Button(mframe, text="Upload!", width=10, height=1, command=Uploading, bg='pink')
     Upload_Button.pack()
     Upload_Button.place(relx=0.5, rely=0.4, anchor='center')
@@ -708,8 +761,6 @@ def win8_Upload(event=None):
     back = tkinter.Button(mframe, text='Back', width=10, height=1, command=win6_Account, bg='pink')
     back.pack()
     back.place(relx=0.5, rely=0.5, anchor='center')
-
-
 
 if __name__ == '__main__':
     """
@@ -722,5 +773,5 @@ if __name__ == '__main__':
     mframe = tkinter.Frame(main, width=800, height=600, background='pink')
     mframe.grid_propagate(0)
     mframe.pack(fill="both", expand=True, padx=20, pady=20)
-    win1() #Generate Welcome Menu
+    win1()  # Generate Welcome Menu
     main.mainloop()
