@@ -17,10 +17,9 @@ USERNAME1 = ''
 PASSWORD1 = ''
 k = 1
 i = 0
-like = 0
-follow = 0
+#like = 0
+#follow = 0
 ig = None
-count_download_request = -1  # Counts the number of download requests
 IMAGES_FILE_PATH = ''  # Path to the file Containing everything to store (Pictures, Captions, DMs, etc...)
 
 
@@ -189,8 +188,6 @@ def download():
     """
 
     def call():
-        global count_download_request
-        count_download_request += 1
         subreddit_name = subreddit.get()
         s = number.get()
         if s == '' or s == '0' or not s.isnumeric():
@@ -221,37 +218,30 @@ def download():
             t.start()
 
         else:  # If everything is good to go, start downloading !
-            n = int(s) + 1
+            n = int(s)
 
             def call():
                 global count_download_request
                 global IMAGES_FILE_PATH
-                if len(IMAGES_FILE_PATH) <= 0:
+                if len(IMAGES_FILE_PATH) == 0:
                     def invalid_path_error():
                         Error_Label = tkinter.Label(mframe, text="Invalid Download Path, please go back to", bg='pink',
                                                     width=200,
-                                                    font=("Courier", 14), pady=50)
+                                                    font=("Courier", 14), pady=30)
                         Error_Label.pack()
                         Error_Label2 = tkinter.Label(mframe, text="Main Menu And Provide A Valid Path", bg='pink',
-                                                     width=200, font=("Courier", 14), pady=50)
+                                                     width=200, font=("Courier", 14), pady=10)
                         Error_Label2.pack()
-                        time.sleep(1.5)
+                        time.sleep(2.5)
                         Error_Label.pack_forget()
                         Error_Label2.pack_forget()
-                        win1()
+                        #win1()
 
                     t = threading.Thread(target=invalid_path_error())
                     t.start()
                 else:
-                    if count_download_request == 0:
-                        Waiting_Label = tkinter.Label(mframe, text="Downloading... Please Wait", bg='pink', width=200,
-                                                      font=("Courier", 20), pady=50)
-                        Waiting_Label.pack()
-                    else:
-                        Waiting_Label = tkinter.Label(mframe, text=f"Please Wait...(request{count_download_request})",
-                                                      bg='pink', width=200,
-                                                      font=("Courier", 20), pady=50)
-
+                    Waiting_Label = tkinter.Label(mframe, text="Downloading... Please Wait", bg='pink', width=200,
+                                                  font=("Courier", 20), pady=50)
                     Waiting_Label.pack()
                     if not os.path.exists(IMAGES_FILE_PATH + os.sep + 'Images'):
                         os.mkdir(IMAGES_FILE_PATH + os.sep + 'Images')
@@ -334,7 +324,7 @@ def win2_Login(event=None):
     global IMAGES_FILE_PATH
     global bool_credentials_confirmed
     bool_credentials_confirmed = False
-    
+
     clearwin()
     login_screen = mframe
 
@@ -386,11 +376,11 @@ def win3_ManagePictures(event=None):
     b2 = tkinter.Button(mframe, command=win5_ManageData_Caption, text='Manage Database/Add Captions', bg='violet',
                         padx=25)
     b2.pack(side='top', expand='YES')
-    b2.place(relx=0.5, rely=0.5, anchor='center')
+    b2.place(relx=0.5, rely=0.4, anchor='center')
 
     b3 = tkinter.Button(mframe, text='Back', width=10, height=1, command=win1, bg='violet', padx=25)
     b3.pack(side='top', expand='YES')
-    b3.place(relx=0.5, rely=0.9, anchor='center')
+    b3.place(relx=0.5, rely=0.5, anchor='center')
 
 
 def win4_DownloadPictures(event=None):
@@ -454,10 +444,10 @@ def win5_ManageData_Caption(event=None):
 
         # Opens the first Image with an adequate format (size)
         Images = Image.open(imgs[0])
-        basewidth = 700
-        wpercent = (basewidth / float(Images.size[0]))
-        hsize = int((float(Images.size[1]) * float(wpercent)))
-        Image_copy = Images.resize((basewidth, hsize), Image.ANTIALIAS)
+        baseheight = 600
+        hpercent = (baseheight / float(Images.size[1]))
+        wsize = int((float(Images.size[0]) * float(hpercent)))
+        Image_copy = Images.resize((wsize, baseheight), Image.ANTIALIAS)
         photo = ImageTk.PhotoImage(Image_copy)
         img_label = tkinter.Label(mframe, image=photo)
         img_label.pack(padx=10, pady=10)
@@ -481,10 +471,10 @@ def win5_ManageData_Caption(event=None):
 
             T.delete("1.0", 'end')
             Images = Image.open(imgs[i])
-            basewidth = 350
-            wpercent = (basewidth / float(Images.size[0]))
-            hsize = int((float(Images.size[1]) * float(wpercent)))
-            Image_copy = Images.resize((basewidth, hsize), Image.ANTIALIAS)
+            baseheight = 600
+            hpercent = (baseheight / float(Images.size[1]))
+            wsize = int((float(Images.size[0]) * float(hpercent)))
+            Image_copy = Images.resize((wsize, baseheight), Image.ANTIALIAS)
             img_label.img = ImageTk.PhotoImage(Image_copy)
             img_label.config(image=img_label.img)
             img_label.image = img_label.img
@@ -604,23 +594,33 @@ def win7_Like_Follow(event=None):
         var_2 = var2.get()  # Determines whether to show the browser or not
 
         if len(tags) == 0:
-            tags_entry = tkinter.Label(mframe, text="Please Indicates The Tags To Explore", bg='pink')
-            tags_entry.pack()
-            time.sleep(1)
-            tags_entry.pack_forget()
+            def tag_error():
+                tags_entry = tkinter.Label(mframe, text="Please Indicates The Tags To Explore", bg='pink')
+                tags_entry.pack()
+                time.sleep(1)
+                tags_entry.pack_forget()
+
+            t = threading.Thread(target=tag_error)
+            t.start()
 
         elif max_likes == '' or max_likes.isalpha() or max_likes == 0:
-            invalid_likes_entry = tkinter.Label(mframe, text="Please Indicate A Valid Number Of Likes", bg='pink')
-            invalid_likes_entry.pack()
-            time.sleep(1)
-            invalid_likes_entry.pack_forget()
+            def like_error():
+                invalid_likes_entry = tkinter.Label(mframe, text="Please Indicate A Valid Number Of Likes", bg='pink')
+                invalid_likes_entry.pack()
+                time.sleep(1)
+                invalid_likes_entry.pack_forget()
+            t = threading.Thread(target=like_error)
+            t.start()
 
         elif max_follows == '' or max_follows.isalpha():
-            invalid_follows_entry = tkinter.Label(mframe, text="Please Indicate A Valid Number Of Likes",
-                                                  bg='pink').pack()
-            invalid_follows_entry.pack()
-            time.sleep(1)
-            invalid_follows_entry.pack_forget()
+            def follow_error():
+                invalid_follows_entry = tkinter.Label(mframe, text="Please Indicate A Valid Number Of People To Follow",
+                                                      bg='pink')
+                invalid_follows_entry.pack()
+                time.sleep(2)
+                invalid_follows_entry.pack_forget()
+            t = threading.Thread(target=follow_error)
+            t.start()
 
         else:  # If everything is good to go
             tags = tags.split(',')
@@ -632,11 +632,14 @@ def win7_Like_Follow(event=None):
                     msg = messages_to_send.split(',')
                     Dms_List = load_DM()
                     ig.login()
-                    ig.like_photo_with_DM(tag, tags, follow, int(max_follows), int(max_likes), Dms_List, msg,
-                                          IMAGES_FILE_PATH)
+                    #ig.like_photo_with_DM(tag, tags, follow, int(max_follows), int(max_likes), Dms_List, msg,
+                                          #IMAGES_FILE_PATH, True)
+                    ig.like_photo(tag, tags, follow, int(max_follows), int(max_likes), Dms_List, msg,
+                                           IMAGES_FILE_PATH, True)
 
                 t = threading.Thread(target=send_with_DM)
                 t.start()
+
             else:  # If we won't DM anyone:
                 def send_without_DM():
                     ig.login()
