@@ -1,5 +1,5 @@
 # Social_Media_Manager
-Python Bot that automates an Instagram account from A to Z
+Python Bot that entirely automates an Instagram account.
 
 ## Introduction
 The purpose of this project is to completely automatise an Instagram account, meaning that this script will take care of all the activity related to your account. 
