@@ -17,8 +17,6 @@ USERNAME1 = ''
 PASSWORD1 = ''
 k = 1
 i = 0
-#like = 0
-#follow = 0
 ig = None
 IMAGES_FILE_PATH = ''  # Path to the file Containing everything to store (Pictures, Captions, DMs, etc...)
 
@@ -171,7 +169,7 @@ def login_verify():
 
 def clearwin(event=None):
     """
-    Clear the main windows frame of all widgets
+    Clears the main window of all widgets
     """
     # for child in mframe.winfo_children():
     # child.destroy()
