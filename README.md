@@ -5,7 +5,7 @@ Python Bot that entirely automates an Instagram account.
 The purpose of this project is to completely automatise an Instagram account, meaning that this script will take care of all the activity related to your account. 
 The only thing the user has to do is to give the 'theme' of his account (I.e : your account could be about food, cars, modelling, sports/coaching, etc...)
 
-## What will this bot exactly do?
+## What will this bot do?
   * Scrape the web for the most trending pictures related to your account's theme.
   * Store a description for each downloaded photo. That description will be used as the picture's caption when we will upload the picture. (Right now, the user has to write down a description for each picture. In the future, I will implement a NLP algorithm to automatically generate a good caption).
   * Upload pictures on your account.
